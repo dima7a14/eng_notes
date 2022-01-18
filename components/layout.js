@@ -1,11 +1,16 @@
 import Head from 'next/head';
-import { Container, Box } from '@chakra-ui/react';
+import { Container, Flex } from '@chakra-ui/react';
 
 import Navbar from './navbar';
+import styles from '../styles/Layout.module.css';
 
 const Layout = ({ children }) => {
 	return (
-		<Box bgGradient="linear(to-br, gray.200, gray.50)">
+		<Flex
+			direction="column"
+			className={styles.layout}
+			bgGradient="linear(to-br, gray.100, gray.50)"
+		>
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<meta
@@ -16,8 +21,19 @@ const Layout = ({ children }) => {
 				<title>English notes</title>
 			</Head>
 			<Navbar />
-			<Container maxW="container.xl">{children}</Container>
-		</Box>
+			<Container
+				flex="1"
+				maxW="container.xl"
+				p={0}
+				backgroundColor="white"
+				border="1px"
+				borderColor="gray.300"
+				borderRadius="md"
+				shadow="base"
+			>
+				{children}
+			</Container>
+		</Flex>
 	);
 };
 

@@ -9,6 +9,7 @@ const Navbar = () => {
 			justify="center"
 			borderBottom="1px"
 			borderBottomColor="gray.300"
+			borderBottomRadius="md"
 			shadow="base"
 			mb={3}
 			position="sticky"
