@@ -1,0 +1,12 @@
+.itemTitle {
+    display: block;
+    background-color: #E2E8F0;
+    color: #2D3748;
+    font-weight: 500;
+    padding: 2rem;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}

@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import {
 	Box,
@@ -9,9 +10,11 @@ import {
 	AccordionButton,
 	AccordionIcon,
 	AccordionPanel,
+	Badge,
 } from '@chakra-ui/react';
 
-import styles from '../styles/Phrase.module.css';
+import styles from '../../styles/Phrase.module.css';
+import phrases from '../../mocks/phrases';
 
 const InfoItem = ({ title, items }) => {
 	return (
@@ -25,6 +28,9 @@ const InfoItem = ({ title, items }) => {
 				>
 					<Box flex="1" textAlign="left">
 						{title}
+						<Badge colorScheme="green" ml="1">
+							{items.length}
+						</Badge>
 					</Box>
 					<AccordionIcon />
 				</AccordionButton>
@@ -48,28 +54,28 @@ InfoItem.propTypes = {
 InfoItem.displayName = 'InfoItem';
 
 const Phrase = () => {
-	const data = {
-		phrase: 'To usher in',
-		translations: ['Ввести, оголошувати'],
-		examples: [
-			'to user in a new era',
-			'the Viennese usher in the New Year with a concert of music by Strauss',
-		],
-	};
+	const router = useRouter();
+	const { name } = router.query;
+	const phrase = phrases.find((p) => p.name === name);
+
+	if (!phrase) {
+		return null;
+	}
 
 	return (
 		<>
 			<Head>
-				<title>{data.phrase}</title>
+				<title>{phrase.name}</title>
 			</Head>
 			<Box>
 				<Heading as="h2" size="4xl" className={styles.phrase}>
-					{data.phrase}
+					{phrase.name}
 				</Heading>
 				<Box p={3}>
 					<Accordion allowMultiple>
-						<InfoItem title="Translations" items={data.translations} />
-						<InfoItem title="Examples" items={data.examples} />
+						<InfoItem title="Translations" items={phrase.translations} />
+						<InfoItem title="Explanations" items={phrase.explanations} />
+						<InfoItem title="Examples" items={phrase.examples} />
 					</Accordion>
 				</Box>
 			</Box>
