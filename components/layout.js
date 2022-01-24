@@ -1,7 +1,8 @@
 import Head from 'next/head';
-import { Container, Flex } from '@chakra-ui/react';
+import { Container, Flex, Box } from '@chakra-ui/react';
 
 import Navbar from './navbar';
+import Breadcrumbs from './breadcrumbs';
 import styles from '../styles/Layout.module.css';
 
 const Layout = ({ children }) => {
@@ -31,6 +32,9 @@ const Layout = ({ children }) => {
 				borderRadius="md"
 				shadow="base"
 			>
+				<Box p={4} textAlign="center">
+					<Breadcrumbs />
+				</Box>
 				{children}
 			</Container>
 		</Flex>
