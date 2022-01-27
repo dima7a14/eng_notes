@@ -1,14 +1,16 @@
-import Link from 'next/link';
-import { Box, Heading, SimpleGrid } from '@chakra-ui/react';
+import NextLink from 'next/link';
+import { Box, Heading, SimpleGrid, Center, Link } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 
 import styles from '../styles/PhrasesList.module.css';
 
 const PhrasesList = ({ items }) => {
 	return (
-		<Box>
+		<Box w="full">
 			<Heading as="h2" size="xl" className="page-title">
-				Phrases
+				<NextLink href="/phrases/">
+					<Link>Phrases</Link>
+				</NextLink>
 			</Heading>
 			{items.length > 0 ? (
 				<SimpleGrid p="4" minChildWidth="250px" spacing="50px">
@@ -21,18 +23,18 @@ const PhrasesList = ({ items }) => {
 							backgroundColor="gray.100"
 							_hover={{ backgroundColor: 'gray.50' }}
 						>
-							<Link href={`/phrases/${encodeURI(item.name)}`} passHref>
-								<Heading as="h6" size="lg" className={styles.name}>
-									{item.name}
-								</Heading>
-							</Link>
+							<Heading as="h6" size="lg">
+								<NextLink href={`/phrases/${encodeURI(item.name)}`} passHref>
+									<Link className={styles.name}>{item.name}</Link>
+								</NextLink>
+							</Heading>
 						</Box>
 					))}
 				</SimpleGrid>
 			) : (
-				<Heading as="h6" size="lg">
+				<Center bg="gray.300" h="100px" w="full" fontSize="xl">
 					No phrases
-				</Heading>
+				</Center>
 			)}
 		</Box>
 	);
