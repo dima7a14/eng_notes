@@ -2,6 +2,7 @@ import NextLink from 'next/link';
 import { Box, Heading, SimpleGrid, Center, Link } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 
+import PhraseForm from './phraseForm';
 import styles from '../styles/PhrasesList.module.css';
 
 const PhrasesList = ({ items }) => {
@@ -36,6 +37,12 @@ const PhrasesList = ({ items }) => {
 					No phrases
 				</Center>
 			)}
+			<PhraseForm
+				title="Add phrase"
+				buttonTitle="Add new phrase"
+				mt="100px"
+				onSubmit={() => {}}
+			/>
 		</Box>
 	);
 };

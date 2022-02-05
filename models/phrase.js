@@ -1,6 +1,6 @@
 import dashify from 'dashify';
 
-export class Phrase {
+export default class Phrase {
 	constructor(data) {
 		this._name = data.name;
 		this._translations = data.translations ?? [];
