@@ -1,4 +1,5 @@
-import Input from './input';
-import Textarea from './textarea';
+import InputField from './input';
+import TextareaField from './textarea';
+import CheckboxField from './checkbox';
 
-export { Input, Textarea };
+export { InputField, TextareaField, CheckboxField };

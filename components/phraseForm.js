@@ -24,10 +24,10 @@ import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray } from 'formik';
 
 import Phrase from '../models/phrase';
-import { Input, Textarea } from './fields';
+import { InputField, TextareaField } from './fields';
 
 function PhraseFieldArray({ name, title, itemTitle, multiline }) {
-	const InputCmp = multiline ? Textarea : Input;
+	const InputCmp = multiline ? TextareaField : InputField;
 
 	return (
 		<FieldArray name={name}>
@@ -37,28 +37,22 @@ function PhraseFieldArray({ name, title, itemTitle, multiline }) {
 						{title}
 					</Heading>
 					{form.values[name].map((value, index) => (
-						<FormControl key={value.id} mb="10px">
-							<FormLabel htmlFor={`${name}.${index}.value`}>
-								{`${itemTitle} ${index + 1}`}
-							</FormLabel>
-							<Flex>
-								<Field
-									name={`${name}.${index}.value`}
-									component={InputCmp}
-									borderTopRightRadius="0"
-									borderBottomRightRadius="0"
-								/>
+						<Field
+							key={value.id}
+							component={InputCmp}
+							name={`${name}.${index}.value`}
+							rightIcon={
 								<IconButton
 									type="button"
 									aria-label={`Remove ${itemTitle}`}
 									icon={<CloseIcon />}
 									colorScheme="red"
-									borderTopLeftRadius="0"
-									borderBottomLeftRadius="0"
 									onClick={() => remove(index)}
+									size="xs"
 								/>
-							</Flex>
-						</FormControl>
+							}
+							formControlProps={{ mb: '10px' }}
+						/>
 					))}
 					<Box>
 						<Button
@@ -141,11 +135,12 @@ function PhraseForm({
 								<DrawerCloseButton />
 								<DrawerHeader>{title}</DrawerHeader>
 								<DrawerBody>
-									<FormControl>
-										<FormLabel htmlFor="name">Phrase</FormLabel>
-										<Field name="name" component={Input} type="text" />
-										{/* <FormHelperText>Phrase</FormHelperText> */}
-									</FormControl>
+									<Field
+										component={InputField}
+										label="Phrase"
+										name="name"
+										placeholder="Phrase"
+									/>
 									<Divider my="20px" />
 									<PhraseFieldArray
 										name="translations"
