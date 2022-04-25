@@ -1,9 +1,8 @@
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import {
 	Box,
-	Flex,
 	Button,
 	Drawer,
 	DrawerBody,
@@ -13,16 +12,21 @@ import {
 	DrawerContent,
 	DrawerCloseButton,
 	useDisclosure,
-	FormControl,
-	FormLabel,
 	Center,
 	Divider,
 	IconButton,
 	Heading,
+	Alert,
+	AlertIcon,
+	AlertTitle,
+	AlertDescription,
+	CloseButton,
+	useToast,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray } from 'formik';
 
+import { createPhrase, updatePhrase, useSupabase } from '../db';
 import Phrase from '../models/phrase';
 import { InputField, TextareaField } from './fields';
 
@@ -83,6 +87,7 @@ PhraseFieldArray.defaultProps = {
 };
 
 function PhraseForm({
+	id,
 	title,
 	buttonTitle,
 	name,
@@ -92,12 +97,48 @@ function PhraseForm({
 	onSubmit,
 	...otherProps
 }) {
+	const [error, setError] = useState(null);
+	const supabase = useSupabase();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const btnRef = useRef();
-	const isUpdate = Boolean(name);
-	const handleSubmit = (values) => {
-		console.log('submit values', values);
+	const toast = useToast();
+	const handleSubmit = async (values) => {
+		setError(null);
+
+		const phrase = new Phrase({
+			...values,
+			userId: supabase.auth.user().id,
+			translations: values.translations
+				.map(({ value }) => value)
+				.filter((value) => Boolean(value)),
+			examples: values.examples
+				.map(({ value }) => value)
+				.filter((value) => Boolean(value)),
+			explanations: values.explanations
+				.map(({ value }) => value)
+				.filter((value) => Boolean(value)),
+		});
+		const { data, error } = id
+			? await updatePhrase(id, phrase.data)
+			: await createPhrase(phrase.data);
+
+		if (error) {
+			setError(error);
+		} else {
+			onSubmit(data);
+			toast({
+				title: id ? 'Phrase updated' : 'Phrase created',
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+			});
+			onClose();
+		}
 	};
+
+	if (!supabase.auth.user()) {
+		return null;
+	}
 
 	return (
 		<>
@@ -135,6 +176,21 @@ function PhraseForm({
 								<DrawerCloseButton />
 								<DrawerHeader>{title}</DrawerHeader>
 								<DrawerBody>
+									{error && (
+										<Alert status="error">
+											<AlertIcon />
+											<AlertTitle mr={2}>{error.status}</AlertTitle>
+											<AlertDescription fontSize="sm">
+												{error.message}
+											</AlertDescription>
+											<CloseButton
+												position="absolute"
+												right="8px"
+												top="8px"
+												onClick={() => setError(null)}
+											/>
+										</Alert>
+									)}
 									<Field
 										component={InputField}
 										label="Phrase"
@@ -165,7 +221,7 @@ function PhraseForm({
 										Cancel
 									</Button>
 									<Button colorScheme="green" type="submit">
-										{isUpdate ? 'Update' : 'Create'}
+										{id ? 'Update' : 'Create'}
 									</Button>
 								</DrawerFooter>
 							</DrawerContent>
@@ -178,6 +234,7 @@ function PhraseForm({
 }
 
 PhraseForm.propTypes = {
+	id: PropTypes.string,
 	title: PropTypes.string.isRequired,
 	buttonTitle: PropTypes.string.isRequired,
 	name: PropTypes.string,

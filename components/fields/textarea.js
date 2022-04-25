@@ -34,15 +34,9 @@ export default function TextareaField({
 				</FormLabel>
 			)}
 			<InputGroup>
-				{leftIcon && (
-					<InputLeftElement pointerEvents="none">{leftIcon}</InputLeftElement>
-				)}
+				{leftIcon && <InputLeftElement>{leftIcon}</InputLeftElement>}
 				<Textarea focusBorderColor="green.400" {...field} {...props} />
-				{rightIcon && (
-					<InputRightElement pointerEvents="none">
-						{rightIcon}
-					</InputRightElement>
-				)}
+				{rightIcon && <InputRightElement>{rightIcon}</InputRightElement>}
 			</InputGroup>
 			{!isError && helperText && (
 				<FormHelperText color="gray.600">{helperText}</FormHelperText>

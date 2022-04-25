@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 
-import phrases from '../../mocks/phrases';
+import { getPhrases } from '../../db';
 import PhrasesList from '../../components/phrasesList';
 
 const Phrases = ({ items = [] }) => {
@@ -16,7 +16,7 @@ const Phrases = ({ items = [] }) => {
 };
 
 Phrases.propTypes = {
-	item: PropTypes.arrayOf(
+	items: PropTypes.arrayOf(
 		PropTypes.shape({
 			name: PropTypes.string,
 			translations: PropTypes.arrayOf(PropTypes.string),
@@ -29,6 +29,18 @@ Phrases.propTypes = {
 export default Phrases;
 
 export async function getServerSideProps(context) {
+	const { data: phrases, error } = await getPhrases();
+
+	if (error) {
+		console.error(error);
+
+		return {
+			props: {
+				items: [],
+			},
+		};
+	}
+
 	return {
 		props: {
 			items: phrases,

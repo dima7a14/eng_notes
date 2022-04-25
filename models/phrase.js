@@ -28,12 +28,12 @@ export default class Phrase {
 			translations: this.translations,
 			explanations: this.explanations,
 			examples: this.examples,
-			userId: this.userId,
+			user_id: this.userId,
 		};
 	}
 
 	get name() {
-		return this.name;
+		return this._name;
 	}
 
 	set name(value) {

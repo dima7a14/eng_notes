@@ -84,3 +84,9 @@ const Phrase = () => {
 };
 
 export default Phrase;
+
+export async function getServerSideProps(context) {
+	return {
+		props: {},
+	};
+}

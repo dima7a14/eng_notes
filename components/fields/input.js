@@ -34,9 +34,7 @@ export default function InputField({
 				</FormLabel>
 			)}
 			<InputGroup>
-				{leftIcon && (
-					<InputLeftElement pointerEvents="none">{leftIcon}</InputLeftElement>
-				)}
+				{leftIcon && <InputLeftElement>{leftIcon}</InputLeftElement>}
 				<Input focusBorderColor="green.400" {...field} {...props} />
 				{rightIcon && <InputRightElement>{rightIcon}</InputRightElement>}
 			</InputGroup>
