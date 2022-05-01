@@ -14,22 +14,14 @@ import {
 } from '@chakra-ui/react';
 import { EmailIcon } from '@chakra-ui/icons';
 
-import { useSupabase } from '../../db';
 import { InputField } from '../fields';
 import { ForgotPasswordSchema } from './common';
 
 export default function ForgotPasswordForm({ onSignInClick }) {
 	const [error, setError] = useState(null);
-	const supabase = useSupabase();
 	const handleSubmit = async ({ email }) => {
+		// TODO: add request sending
 		setError(null);
-		const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-		if (error) {
-			setError(error);
-		} else {
-			onSignInClick();
-		}
 	};
 
 	return (

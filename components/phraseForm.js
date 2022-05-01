@@ -26,7 +26,6 @@ import {
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray } from 'formik';
 
-import { createPhrase, updatePhrase, useSupabase } from '../db';
 import Phrase from '../models/phrase';
 import { InputField, TextareaField } from './fields';
 
@@ -98,7 +97,6 @@ function PhraseForm({
 	...otherProps
 }) {
 	const [error, setError] = useState(null);
-	const supabase = useSupabase();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const btnRef = useRef();
 	const toast = useToast();
@@ -107,7 +105,7 @@ function PhraseForm({
 
 		const phrase = new Phrase({
 			...values,
-			userId: supabase.auth.user().id,
+			// userId: supabase.auth.user().id,
 			translations: values.translations
 				.map(({ value }) => value)
 				.filter((value) => Boolean(value)),
@@ -118,14 +116,9 @@ function PhraseForm({
 				.map(({ value }) => value)
 				.filter((value) => Boolean(value)),
 		});
-		const { data, error } = id
-			? await updatePhrase(id, phrase.data)
-			: await createPhrase(phrase.data);
 
-		if (error) {
-			setError(error);
-		} else {
-			onSubmit(data);
+		try {
+			onSubmit(phrase.data);
 			toast({
 				title: id ? 'Phrase updated' : 'Phrase created',
 				status: 'success',
@@ -133,12 +126,10 @@ function PhraseForm({
 				isClosable: true,
 			});
 			onClose();
+		} catch (error) {
+			setError(error);
 		}
 	};
-
-	if (!supabase.auth.user()) {
-		return null;
-	}
 
 	return (
 		<>

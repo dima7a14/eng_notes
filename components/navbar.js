@@ -1,4 +1,5 @@
-import { Flex, Heading } from '@chakra-ui/react';
+import NextLink from 'next/link';
+import { Flex, Heading, Link } from '@chakra-ui/react';
 
 const Navbar = () => {
 	return (
@@ -17,7 +18,9 @@ const Navbar = () => {
 			left="0"
 		>
 			<Heading as="h2" textAlign="center" variant="lg" color="gray.700">
-				English Notes
+				<NextLink href="/">
+					<Link>English Notes</Link>
+				</NextLink>
 			</Heading>
 		</Flex>
 	);

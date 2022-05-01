@@ -18,20 +18,14 @@ import {
 } from '@chakra-ui/react';
 import { EmailIcon, LockIcon } from '@chakra-ui/icons';
 
-import { useSupabase } from '../../db';
 import { InputField, CheckboxField } from '../fields';
 import { UserSchema } from './common';
 
 export default function SignUpForm({ onSignInClick }) {
 	const [error, setError] = useState(null);
-	const supabase = useSupabase();
 	const handleSubmit = async (values) => {
+		// TODO: add request sending
 		setError(null);
-		const { data, error } = await supabase.auth.signUp(values);
-
-		if (error) {
-			setError(error);
-		}
 	};
 
 	return (

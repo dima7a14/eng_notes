@@ -2,10 +2,21 @@ import NextLink from 'next/link';
 import { Box, Heading, SimpleGrid, Center, Link } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 
+import server from '../consts/server';
 import PhraseForm from './phraseForm';
 import styles from '../styles/PhrasesList.module.css';
 
 const PhrasesList = ({ items }) => {
+	const createPhrase = (data) => {
+		fetch(`${server}/api/phrases`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		});
+	};
+
 	return (
 		<Box w="full">
 			<Heading as="h2" size="xl" className="page-title">
@@ -25,7 +36,7 @@ const PhrasesList = ({ items }) => {
 							_hover={{ backgroundColor: 'gray.50' }}
 						>
 							<Heading as="h6" size="lg">
-								<NextLink href={`/phrases/${encodeURI(item.name)}`} passHref>
+								<NextLink href={`/phrases/${encodeURI(item.slug)}`} passHref>
 									<Link className={styles.name}>{item.name}</Link>
 								</NextLink>
 							</Heading>
@@ -41,7 +52,7 @@ const PhrasesList = ({ items }) => {
 				title="Add phrase"
 				buttonTitle="Add new phrase"
 				mt="100px"
-				onSubmit={() => {}}
+				onSubmit={createPhrase}
 			/>
 		</Box>
 	);

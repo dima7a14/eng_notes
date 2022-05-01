@@ -1,15 +1,11 @@
 import Head from 'next/head';
 import { Container, Flex, Box, Button, Text } from '@chakra-ui/react';
 
-import { useSupabase } from '../db';
-import Auth from './auth';
 import Navbar from './navbar';
 import Breadcrumbs from './breadcrumbs';
 import styles from '../styles/Layout.module.css';
 
 const Layout = ({ user, children }) => {
-	const supabaseClient = useSupabase();
-
 	return (
 		<Flex
 			direction="column"
@@ -45,30 +41,13 @@ const Layout = ({ user, children }) => {
 						<Breadcrumbs />
 						<Flex flexDir="row" justify="flex-end" alignItems="center">
 							<Text>Signed in: {user.email}</Text>
-							<Button
-								variant="link"
-								ml={2}
-								onClick={() => supabaseClient.auth.signOut()}
-							>
+							<Button variant="link" ml={2} onClick={() => {}}>
 								Signed out
 							</Button>
 						</Flex>
 					</Flex>
 				)}
-				{user ? (
-					<Box flex="1">{children}</Box>
-				) : (
-					<Flex
-						direction="column"
-						justify="center"
-						alignItems="center"
-						flex={1}
-					>
-						<Box p={4} maxW="720px">
-							<Auth />
-						</Box>
-					</Flex>
-				)}
+				<Box flex="1">{children}</Box>
 			</Container>
 		</Flex>
 	);

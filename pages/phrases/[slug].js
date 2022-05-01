@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import {
 	Box,
@@ -13,8 +12,8 @@ import {
 	Badge,
 } from '@chakra-ui/react';
 
+import server from '../../consts/server';
 import styles from '../../styles/Phrase.module.css';
-import phrases from '../../mocks/phrases';
 
 const InfoItem = ({ title, items }) => {
 	return (
@@ -53,11 +52,7 @@ InfoItem.propTypes = {
 
 InfoItem.displayName = 'InfoItem';
 
-const Phrase = () => {
-	const router = useRouter();
-	const { name } = router.query;
-	const phrase = phrases.find((p) => p.name === name);
-
+const Phrase = ({ phrase }) => {
 	if (!phrase) {
 		return null;
 	}
@@ -86,7 +81,18 @@ const Phrase = () => {
 export default Phrase;
 
 export async function getServerSideProps(context) {
+	const {
+		query: { slug },
+	} = context;
+	const data = await fetch(`${server}/api/phrases/${slug}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	});
+	const phrase = await data.json();
+
 	return {
-		props: {},
+		props: { phrase },
 	};
 }

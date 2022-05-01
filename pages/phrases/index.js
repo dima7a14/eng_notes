@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 
-import { getPhrases } from '../../db';
+import server from '../../consts/server';
 import PhrasesList from '../../components/phrasesList';
 
 const Phrases = ({ items = [] }) => {
@@ -29,21 +29,17 @@ Phrases.propTypes = {
 export default Phrases;
 
 export async function getServerSideProps(context) {
-	const { data: phrases, error } = await getPhrases();
-
-	if (error) {
-		console.error(error);
-
-		return {
-			props: {
-				items: [],
-			},
-		};
-	}
+	const phrases = await fetch(`${server}/api/phrases`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	});
+	const items = await phrases.json();
 
 	return {
 		props: {
-			items: phrases,
+			items,
 		},
 	};
 }

@@ -6,7 +6,7 @@ export default class Phrase {
 		this._translations = data.translations ?? [];
 		this._explanations = data.explanations ?? [];
 		this._examples = data.examples ?? [];
-		this._userId = data.userId;
+		// this._userId = data.userId;
 	}
 
 	get isValid() {
@@ -28,7 +28,7 @@ export default class Phrase {
 			translations: this.translations,
 			explanations: this.explanations,
 			examples: this.examples,
-			user_id: this.userId,
+			// user_id: this.userId,
 		};
 	}
 
@@ -68,13 +68,13 @@ export default class Phrase {
 		this._examples = values;
 	}
 
-	get userId() {
-		return this._userId;
-	}
+	// get userId() {
+	// 	return this._userId;
+	// }
 
-	set userId(value) {
-		this._userId = value;
-	}
+	// set userId(value) {
+	// 	this._userId = value;
+	// }
 
 	validate() {
 		const errors = {};
@@ -87,9 +87,9 @@ export default class Phrase {
 			errors.slug = 'Slug is required.';
 		}
 
-		if (!this.userId) {
-			errors.userId = 'User id is required';
-		}
+		// if (!this.userId) {
+		// 	errors.userId = 'User id is required';
+		// }
 
 		return errors;
 	}
