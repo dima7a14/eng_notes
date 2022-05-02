@@ -84,15 +84,22 @@ export async function getServerSideProps(context) {
 	const {
 		query: { slug },
 	} = context;
-	const data = await fetch(`${server}/api/phrases/${slug}`, {
+	const response = await fetch(`${server}/api/phrases/${slug}`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
 		},
 	});
-	const phrase = await data.json();
+
+	if (response.status === 200) {
+		const phrase = await response.json();
+
+		return {
+			props: { phrase },
+		};
+	}
 
 	return {
-		props: { phrase },
+		props: {},
 	};
 }

@@ -1,6 +1,15 @@
+import { getSession } from 'next-auth/react';
+
 import { prisma } from '../../../lib/prisma';
 
 export default async function handler(req, res) {
+	const session = getSession();
+
+	if (!session) {
+		res.status(401).json({ message: 'Not authenticated' });
+		return;
+	}
+
 	if (req.method === 'GET') {
 		const phrases = await prisma.phrase.findMany();
 

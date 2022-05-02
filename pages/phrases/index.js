@@ -29,17 +29,22 @@ Phrases.propTypes = {
 export default Phrases;
 
 export async function getServerSideProps(context) {
-	const phrases = await fetch(`${server}/api/phrases`, {
+	const response = await fetch(`${server}/api/phrases`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
 		},
 	});
-	const items = await phrases.json();
 
-	return {
-		props: {
-			items,
-		},
-	};
+	if (response.status === 200) {
+		const items = await response.json();
+
+		return {
+			props: {
+				items,
+			},
+		};
+	}
+
+	return { props: { items: [] } };
 }
