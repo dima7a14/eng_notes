@@ -18,6 +18,11 @@ export default async function handler(req, res) {
 			where: { slug },
 		});
 
+		if (phrase === null) {
+			res.status(404).json({ message: 'Phrase not found' });
+			return;
+		}
+
 		res.status(200).json(phrase);
 	} else {
 		res.setHeader('Allow', ['GET']);

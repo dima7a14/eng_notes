@@ -1,12 +1,21 @@
 import Head from 'next/head';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { Container, Flex, Box, Button, Text } from '@chakra-ui/react';
+import {
+	Container,
+	Flex,
+	Box,
+	Button,
+	Text,
+	useDisclosure,
+} from '@chakra-ui/react';
 
 import Navbar from './navbar';
 import Breadcrumbs from './breadcrumbs';
+import Auth, { forms } from './auth';
 import styles from '../styles/Layout.module.css';
 
 const Layout = ({ children }) => {
+	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { data: session } = useSession();
 
 	return (
@@ -51,9 +60,16 @@ const Layout = ({ children }) => {
 							</Flex>
 						</>
 					) : (
-						<Button variant="link" onClick={signIn}>
-							Sign In
-						</Button>
+						<>
+							<Button variant="link" onClick={onOpen}>
+								Sign In
+							</Button>
+							<Auth
+								isOpen={isOpen}
+								initialForm={forms.signIn}
+								onClose={onClose}
+							/>
+						</>
 					)}
 				</Flex>
 				<Box flex="1">{children}</Box>

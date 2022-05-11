@@ -17,11 +17,12 @@ import { EmailIcon } from '@chakra-ui/icons';
 import { InputField } from '../fields';
 import { ForgotPasswordSchema } from './common';
 
-export default function ForgotPasswordForm({ onSignInClick }) {
+export default function ForgotPasswordForm({ onSignInClick, onSubmit }) {
 	const [error, setError] = useState(null);
 	const handleSubmit = async ({ email }) => {
 		// TODO: add request sending
 		setError(null);
+		onSubmit();
 	};
 
 	return (
@@ -86,4 +87,9 @@ export default function ForgotPasswordForm({ onSignInClick }) {
 
 ForgotPasswordForm.propTypes = {
 	onSignInClick: PropTypes.func.isRequired,
+	onSubmit: PropTypes.func,
+};
+
+ForgotPasswordForm.defaultProps = {
+	onSubmit: () => null,
 };

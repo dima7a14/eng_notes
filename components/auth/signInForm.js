@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { signIn } from 'next-auth/react';
 import { Formik, Form, Field } from 'formik';
 import {
 	Box,
@@ -18,13 +19,30 @@ import {
 } from '@chakra-ui/react';
 import { EmailIcon, LockIcon } from '@chakra-ui/icons';
 
+import server from '../../consts/server';
 import { InputField, CheckboxField } from '../fields';
 import { UserSchema } from './common';
 
-export default function SignInForm({ onForgotPasswordClick, onSignUpClick }) {
+export default function SignInForm({
+	onSubmit,
+	onForgotPasswordClick,
+	onSignUpClick,
+}) {
 	const [error, setError] = useState(null);
 	const handleSubmit = async (values) => {
-		// TODO: add request sending
+		try {
+			setError(null);
+
+			const res = await signIn('credentials', {
+				email: values.email,
+				password: values.password,
+				redirect: false,
+			});
+
+			onSubmit();
+		} catch (err) {
+			setError(err);
+		}
 	};
 
 	return (
@@ -130,4 +148,9 @@ export default function SignInForm({ onForgotPasswordClick, onSignUpClick }) {
 SignInForm.propTypes = {
 	onForgotPasswordClick: PropTypes.func.isRequired,
 	onSignUpClick: PropTypes.func.isRequired,
+	onSubmit: PropTypes.func,
+};
+
+SignInForm.defaultProps = {
+	onSubmit: () => null,
 };
