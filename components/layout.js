@@ -1,17 +1,9 @@
 import Head from 'next/head';
-import { useSession, signIn, signOut } from 'next-auth/react';
-import {
-	Container,
-	Flex,
-	Box,
-	Button,
-	Text,
-	useDisclosure,
-} from '@chakra-ui/react';
+import { useSession, signOut } from 'next-auth/react';
+import { Container, Flex, Button, Text, useDisclosure } from '@chakra-ui/react';
 
 import Navbar from './navbar';
 import Breadcrumbs from './breadcrumbs';
-import Auth, { forms } from './auth';
 import styles from '../styles/Layout.module.css';
 
 const Layout = ({ children }) => {
@@ -48,31 +40,22 @@ const Layout = ({ children }) => {
 				justifyContent="center"
 				flexWrap="nowrap"
 			>
-				<Flex p={4} flexDir="row" justify="space-between" alignItems="center">
-					{session ? (
+				{session && (
+					<Flex p={4} flexDir="row" justify="space-between" alignItems="center">
 						<>
 							<Breadcrumbs />
 							<Flex flexDir="row" justify="flex-end" alignItems="center">
 								<Text>Signed in: {session.user?.email}</Text>
 								<Button variant="link" ml={2} onClick={signOut}>
-									Signed out
+									Sign out
 								</Button>
 							</Flex>
 						</>
-					) : (
-						<>
-							<Button variant="link" onClick={onOpen}>
-								Sign In
-							</Button>
-							<Auth
-								isOpen={isOpen}
-								initialForm={forms.signIn}
-								onClose={onClose}
-							/>
-						</>
-					)}
+					</Flex>
+				)}
+				<Flex direction="column" flex="1">
+					{children}
 				</Flex>
-				<Box flex="1">{children}</Box>
 			</Container>
 		</Flex>
 	);

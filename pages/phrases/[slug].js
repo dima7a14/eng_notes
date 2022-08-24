@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { unstable_getServerSession } from 'next-auth/next';
 import PropTypes from 'prop-types';
 import {
 	Box,
@@ -13,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 
 import server from '../../consts/server';
+import { authOptions } from '../api/auth/[...nextauth]';
 import styles from '../../styles/Phrase.module.css';
 
 const InfoItem = ({ title, items }) => {
@@ -80,10 +82,19 @@ const Phrase = ({ phrase }) => {
 
 export default Phrase;
 
-export async function getServerSideProps(context) {
-	const {
-		query: { slug },
-	} = context;
+export async function getServerSideProps({ req, res, query }) {
+	const session = await unstable_getServerSession(req, res, authOptions);
+
+	if (!session) {
+		return {
+			redirect: {
+				destination: '/login',
+			},
+		};
+	}
+
+	let phrase;
+	const { slug } = query;
 	const response = await fetch(`${server}/api/phrases/${slug}`, {
 		method: 'GET',
 		headers: {
@@ -92,14 +103,10 @@ export async function getServerSideProps(context) {
 	});
 
 	if (response.status === 200) {
-		const phrase = await response.json();
-
-		return {
-			props: { phrase },
-		};
+		phrase = await response.json();
 	}
 
 	return {
-		props: {},
+		props: { phrase },
 	};
 }

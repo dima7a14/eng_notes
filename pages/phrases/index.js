@@ -1,7 +1,9 @@
 import Head from 'next/head';
+import { unstable_getServerSession } from 'next-auth/next';
 import PropTypes from 'prop-types';
 
 import server from '../../consts/server';
+import { authOptions } from '../api/auth/[...nextauth]';
 import PhrasesList from '../../components/phrasesList';
 
 const Phrases = ({ items = [] }) => {
@@ -29,6 +31,21 @@ Phrases.propTypes = {
 export default Phrases;
 
 export async function getServerSideProps(context) {
+	const session = await unstable_getServerSession(
+		context.req,
+		context.res,
+		authOptions,
+	);
+
+	if (!session) {
+		return {
+			redirect: {
+				destination: '/login',
+			},
+		};
+	}
+
+	let items = [];
 	const response = await fetch(`${server}/api/phrases`, {
 		method: 'GET',
 		headers: {
@@ -37,14 +54,8 @@ export async function getServerSideProps(context) {
 	});
 
 	if (response.status === 200) {
-		const items = await response.json();
-
-		return {
-			props: {
-				items,
-			},
-		};
+		items = await response.json();
 	}
 
-	return { props: { items: [] } };
+	return { props: { items } };
 }
