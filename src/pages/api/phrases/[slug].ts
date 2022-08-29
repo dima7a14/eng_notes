@@ -1,8 +1,12 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 
 import { prisma } from '../../../lib/prisma';
 
-export default async function handler(req, res) {
+export default async function handler(
+	req: NextApiRequest,
+	res: NextApiResponse,
+) {
 	const session = getSession();
 
 	if (!session) {
@@ -11,7 +15,12 @@ export default async function handler(req, res) {
 	}
 
 	if (req.method === 'GET') {
-		const { slug } = req.query;
+		const slug: string = (req.query.slug as string) ?? null;
+
+		if (!slug) {
+			res.status(422).json({ message: 'No slug' });
+			return;
+		}
 
 		// TODO: add error handler
 		const phrase = await prisma.phrase.findUnique({

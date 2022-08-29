@@ -1,5 +1,4 @@
-import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
 	Box,
@@ -26,10 +25,26 @@ import {
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray } from 'formik';
 
-import Phrase from '../models/phrase';
+import { Phrase } from '@/models/phrase';
 import { InputField, TextareaField } from './fields';
 
-function PhraseFieldArray({ name, title, itemTitle, multiline }) {
+type PhraseFieldArrayProps = {
+	name: string;
+	title: string;
+	itemTitle: string;
+	multiline?: boolean;
+};
+
+type PhraseFieldArrayValue = {
+	id: string;
+	value: string;
+};
+
+function parseFieldArrayValue(value: string): PhraseFieldArrayValue {
+	return { value, id: uuidv4() };
+}
+
+const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({ name, title, itemTitle, multiline = false }) => {
 	const InputCmp = multiline ? TextareaField : InputField;
 
 	return (
@@ -39,7 +54,7 @@ function PhraseFieldArray({ name, title, itemTitle, multiline }) {
 					<Heading as="h6" size="md" mb="20px">
 						{title}
 					</Heading>
-					{form.values[name].map((value, index) => (
+					{form.values[name].map((value: PhraseFieldArrayValue, index: number) => (
 						<Field
 							key={value.id}
 							component={InputCmp}
@@ -74,38 +89,41 @@ function PhraseFieldArray({ name, title, itemTitle, multiline }) {
 	);
 }
 
-PhraseFieldArray.propTypes = {
-	name: PropTypes.string.isRequired,
-	title: PropTypes.string.isRequired,
-	itemTitle: PropTypes.string.isRequired,
-	multiline: PropTypes.bool,
+type PhraseFormProps = Partial<Omit<Phrase, 'userId'>> & {
+	title: string;
+	buttonTitle: string;
+	onSubmit: (data: Phrase) => unknown;
 };
 
-PhraseFieldArray.defaultProps = {
-	multiline: false,
+type PhraseFormValues = {
+	name: string;
+	translations: PhraseFieldArrayValue[];
+	examples: PhraseFieldArrayValue[];
+	explanations: PhraseFieldArrayValue[];
 };
 
-function PhraseForm({
+const PhraseForm: React.FC<PhraseFormProps> = ({
 	id,
 	title,
 	buttonTitle,
-	name,
-	translations,
-	explanations,
-	examples,
+	name = '',
+	translations = [],
+	explanations = [],
+	examples = [],
 	onSubmit,
 	...otherProps
-}) {
-	const [error, setError] = useState(null);
+}) => {
+	const [error, setError] = useState<Error | null>(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const btnRef = useRef();
+	const btnRef = useRef<HTMLButtonElement | null>(null);
 	const toast = useToast();
-	const handleSubmit = async (values) => {
+	const handleSubmit = async (values: PhraseFormValues) => {
 		setError(null);
 
-		const phrase = new Phrase({
+		const phrase: Phrase = {
 			...values,
 			// userId: supabase.auth.user().id,
+			userId: '1', // TODO: remove it
 			translations: values.translations
 				.map(({ value }) => value)
 				.filter((value) => Boolean(value)),
@@ -115,10 +133,10 @@ function PhraseForm({
 			explanations: values.explanations
 				.map(({ value }) => value)
 				.filter((value) => Boolean(value)),
-		});
+		};
 
 		try {
-			onSubmit(phrase.data);
+			onSubmit(phrase);
 			toast({
 				title: id ? 'Phrase updated' : 'Phrase created',
 				status: 'success',
@@ -127,7 +145,9 @@ function PhraseForm({
 			});
 			onClose();
 		} catch (error) {
-			setError(error);
+			if (error instanceof Error) {
+				setError(error);
+			}
 		}
 	};
 
@@ -154,9 +174,9 @@ function PhraseForm({
 				<Formik
 					initialValues={{
 						name,
-						translations,
-						explanations,
-						examples,
+						translations: translations.map(parseFieldArrayValue),
+						explanations: explanations.map(parseFieldArrayValue),
+						examples: examples.map(parseFieldArrayValue),
 					}}
 					onSubmit={handleSubmit}
 				>
@@ -170,7 +190,7 @@ function PhraseForm({
 									{error && (
 										<Alert status="error">
 											<AlertIcon />
-											<AlertTitle mr={2}>{error.status}</AlertTitle>
+											{/* <AlertTitle mr={2}>{error.status}</AlertTitle> */}
 											<AlertDescription fontSize="sm">
 												{error.message}
 											</AlertDescription>
@@ -222,24 +242,7 @@ function PhraseForm({
 			</Drawer>
 		</>
 	);
-}
-
-PhraseForm.propTypes = {
-	id: PropTypes.string,
-	title: PropTypes.string.isRequired,
-	buttonTitle: PropTypes.string.isRequired,
-	name: PropTypes.string,
-	translations: PropTypes.arrayOf(PropTypes.string),
-	explanations: PropTypes.arrayOf(PropTypes.string),
-	examples: PropTypes.arrayOf(PropTypes.string),
-	onSubmit: PropTypes.func.isRequired,
 };
 
-PhraseForm.defaultProps = {
-	name: '',
-	translations: [],
-	explanations: [],
-	examples: [],
-};
 
 export default PhraseForm;

@@ -1,13 +1,18 @@
+import React from 'react';
 import NextLink from 'next/link';
 import { Box, Heading, SimpleGrid, Center, Link } from '@chakra-ui/react';
-import PropTypes from 'prop-types';
 
-import server from '../consts/server';
+import server from '@/consts/server';
+import styles from '@/styles/PhrasesList.module.css';
+import type { Phrase } from '@/models/phrase';
 import PhraseForm from './phraseForm';
-import styles from '../styles/PhrasesList.module.css';
 
-const PhrasesList = ({ items }) => {
-	const createPhrase = (data) => {
+export type PhrasesListProps = {
+	items: Phrase[];
+};
+
+const PhrasesList: React.FC<PhrasesListProps> = ({ items }) => {
+	const createPhrase = (data: Phrase) => {
 		fetch(`${server}/api/phrases`, {
 			method: 'POST',
 			headers: {
@@ -36,7 +41,7 @@ const PhrasesList = ({ items }) => {
 							_hover={{ backgroundColor: 'gray.50' }}
 						>
 							<Heading as="h6" size="lg">
-								<NextLink href={`/phrases/${encodeURI(item.slug)}`} passHref>
+								<NextLink href={`/phrases/${encodeURI(item.slug ?? '')}`} passHref>
 									<Link className={styles.name}>{item.name}</Link>
 								</NextLink>
 							</Heading>
@@ -57,13 +62,4 @@ const PhrasesList = ({ items }) => {
 		</Box>
 	);
 };
-
-PhrasesList.propTypes = {
-	items: PropTypes.arrayOf(
-		PropTypes.shape({
-			name: PropTypes.string,
-		}),
-	),
-};
-
 export default PhrasesList;

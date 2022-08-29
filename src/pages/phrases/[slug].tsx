@@ -1,6 +1,7 @@
+import React from 'react';
+import type { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { unstable_getServerSession } from 'next-auth/next';
-import PropTypes from 'prop-types';
 import {
 	Box,
 	Heading,
@@ -13,11 +14,17 @@ import {
 	Badge,
 } from '@chakra-ui/react';
 
-import server from '../../consts/server';
+import server from '@/consts/server';
+import styles from '@/styles/Phrase.module.css';
+import type { Phrase } from '@/models/phrase';
 import { authOptions } from '../api/auth/[...nextauth]';
-import styles from '../../styles/Phrase.module.css';
 
-const InfoItem = ({ title, items }) => {
+type InfoItemProps = {
+	title: string;
+	items: string[];
+};
+
+const InfoItem: React.FC<InfoItemProps> = ({ title, items }) => {
 	return (
 		<AccordionItem>
 			<h3>
@@ -38,7 +45,7 @@ const InfoItem = ({ title, items }) => {
 			</h3>
 			<AccordionPanel pb={4} backgroundColor="gray.100">
 				{items.map((item) => (
-					<Text key={item} py={3} size="lg">
+					<Text key={item} py={3} fontSize="lg">
 						{item}
 					</Text>
 				))}
@@ -47,14 +54,13 @@ const InfoItem = ({ title, items }) => {
 	);
 };
 
-InfoItem.propTypes = {
-	title: PropTypes.string,
-	items: PropTypes.arrayOf(PropTypes.string),
-};
-
 InfoItem.displayName = 'InfoItem';
 
-const Phrase = ({ phrase }) => {
+export type PhraseProps = {
+	phrase: Phrase;
+};
+
+const Phrase: React.FC<PhraseProps> = ({ phrase }) => {
 	if (!phrase) {
 		return null;
 	}
@@ -82,7 +88,7 @@ const Phrase = ({ phrase }) => {
 
 export default Phrase;
 
-export async function getServerSideProps({ req, res, query }) {
+export async function getServerSideProps({ req, res, query }: GetServerSidePropsContext) {
 	const session = await unstable_getServerSession(req, res, authOptions);
 
 	if (!session) {

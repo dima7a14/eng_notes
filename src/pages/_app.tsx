@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { ComponentType } from 'react';
+import type { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
 import { ChakraProvider } from '@chakra-ui/react';
 
 import Layout from '../components/layout';
+import { theme } from '../styles/theme';
 import '../styles/globals.css';
 
-export default function MyApp({
+const App: React.FC<AppProps> = ({
 	Component,
 	pageProps: { session, ...pageProps },
-}) {
-	return (
+}) => (
 		<SessionProvider session={session}>
-			<ChakraProvider>
+			<ChakraProvider theme={theme}>
 				<Layout>
 					<Component {...pageProps} />
 				</Layout>
 			</ChakraProvider>
 		</SessionProvider>
 	);
-}
+
+
+export default App;

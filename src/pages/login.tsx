@@ -1,19 +1,15 @@
 import React from 'react';
+import type { GetServerSidePropsContext } from 'next';
 import { signIn } from 'next-auth/react';
 import { unstable_getServerSession } from 'next-auth/next';
 import {
 	Button,
 	Center,
-	VStack,
-	Heading,
-	Container,
-	Flex,
 } from '@chakra-ui/react';
 
 import { authOptions } from './api/auth/[...nextauth]';
 
-export default function Login() {
-	return (
+const Login: React.FC = () => (
 		<>
 			<Center
 				bg="gray.100"
@@ -26,8 +22,6 @@ export default function Login() {
 			>
 				Sign In
 			</Center>
-			{/* <Container flex="1"> */}
-			{/* <VStack p={4} spacing={24}> */}
 			<Center flex="1">
 				<Button
 					colorScheme="red"
@@ -38,13 +32,12 @@ export default function Login() {
 					Sign in with Google
 				</Button>
 			</Center>
-			{/* </VStack> */}
-			{/* </Container> */}
 		</>
 	);
-}
 
-export async function getServerSideProps(context) {
+export default Login;
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
 	const session = await unstable_getServerSession(
 		context.req,
 		context.res,

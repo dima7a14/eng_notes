@@ -1,12 +1,18 @@
+import React from 'react';
+import type { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { unstable_getServerSession } from 'next-auth/next';
-import PropTypes from 'prop-types';
 
-import server from '../../consts/server';
+import server from '@/consts/server';
+import PhrasesList from '@/components/phrasesList';
+import { Phrase } from '@/models/phrase';
 import { authOptions } from '../api/auth/[...nextauth]';
-import PhrasesList from '../../components/phrasesList';
 
-const Phrases = ({ items = [] }) => {
+export type PhrasesProps = {
+	items: Phrase[];
+};
+
+const Phrases: React.FC<PhrasesProps> = ({ items = [] }) => {
 	return (
 		<>
 			<Head>
@@ -17,20 +23,9 @@ const Phrases = ({ items = [] }) => {
 	);
 };
 
-Phrases.propTypes = {
-	items: PropTypes.arrayOf(
-		PropTypes.shape({
-			name: PropTypes.string,
-			translations: PropTypes.arrayOf(PropTypes.string),
-			explanations: PropTypes.arrayOf(PropTypes.string),
-			examples: PropTypes.arrayOf(PropTypes.string),
-		}),
-	),
-};
-
 export default Phrases;
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
 	const session = await unstable_getServerSession(
 		context.req,
 		context.res,
