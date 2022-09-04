@@ -4,18 +4,11 @@ import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { unstable_getServerSession } from 'next-auth/next';
 
-import server from '@/consts/server';
 import PhrasesList from '@/components/phrasesList';
 import styles from '@/styles/Home.module.css';
-import type { Phrase } from '@/models/phrase';
 import { authOptions } from './api/auth/[...nextauth]';
 
-export type HomeProps = {
-	items: Phrase[];
-};
-
-
-const Home: React.FC<HomeProps> = ({ items = [] }) => {
+const Home: React.FC = () => {
 	const { data: session } = useSession();
 
 	return (
@@ -25,7 +18,7 @@ const Home: React.FC<HomeProps> = ({ items = [] }) => {
 			</Head>
 
 			<main className={styles.main}>
-				{session && <PhrasesList items={items} />}
+				{session && <PhrasesList />}
 			</main>
 		</div>
 	);
@@ -48,19 +41,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 		};
 	}
 
-	let items = [];
-	const response = await fetch(`${server}/api/phrases`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
-
-	if (response.status === 200) {
-		items = await response.json();
-	}
-
 	return {
-		props: { items },
+		props: {},
 	};
 }

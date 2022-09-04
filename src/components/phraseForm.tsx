@@ -123,8 +123,6 @@ const PhraseForm: React.FC<PhraseFormProps> = ({
 
 		const phrase: Phrase = {
 			...values,
-			// userId: supabase.auth.user().id,
-			userId: '1', // TODO: remove it
 			translations: values.translations
 				.map(({ value }) => value)
 				.filter((value) => Boolean(value)),

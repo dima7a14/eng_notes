@@ -3,22 +3,16 @@ import type { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { unstable_getServerSession } from 'next-auth/next';
 
-import server from '@/consts/server';
 import PhrasesList from '@/components/phrasesList';
-import { Phrase } from '@/models/phrase';
 import { authOptions } from '../api/auth/[...nextauth]';
 
-export type PhrasesProps = {
-	items: Phrase[];
-};
-
-const Phrases: React.FC<PhrasesProps> = ({ items = [] }) => {
+const Phrases: React.FC = () => {
 	return (
 		<>
 			<Head>
 				<title>Phrases</title>
 			</Head>
-			<PhrasesList items={items} />
+			<PhrasesList />
 		</>
 	);
 };
@@ -40,17 +34,5 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 		};
 	}
 
-	let items = [];
-	const response = await fetch(`${server}/api/phrases`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
-
-	if (response.status === 200) {
-		items = await response.json();
-	}
-
-	return { props: { items } };
+	return { props: {} };
 }

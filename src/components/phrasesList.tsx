@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NextLink from 'next/link';
 import { Box, Heading, SimpleGrid, Center, Link } from '@chakra-ui/react';
 
@@ -8,10 +8,11 @@ import type { Phrase } from '@/models/phrase';
 import PhraseForm from './phraseForm';
 
 export type PhrasesListProps = {
-	items: Phrase[];
+	items?: Phrase[];
 };
 
-const PhrasesList: React.FC<PhrasesListProps> = ({ items }) => {
+const PhrasesList: React.FC<PhrasesListProps> = ({ items = [] }) => {
+	const [phrases, setPhrases] = useState(items);
 	const createPhrase = (data: Phrase) => {
 		fetch(`${server}/api/phrases`, {
 			method: 'POST',
@@ -22,6 +23,25 @@ const PhrasesList: React.FC<PhrasesListProps> = ({ items }) => {
 		});
 	};
 
+	useEffect(() => {
+		const fetchPhrases = async () => {
+			const response = await fetch(`${server}/api/phrases`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+
+			if (response.status === 200) {
+				const data: Phrase[] = await response.json();
+
+				setPhrases(data);
+			}
+		};
+
+		fetchPhrases();
+	}, []);
+
 	return (
 		<Box w="full">
 			<Heading as="h2" size="xl" className="page-title">
@@ -29,9 +49,9 @@ const PhrasesList: React.FC<PhrasesListProps> = ({ items }) => {
 					<Link>Phrases</Link>
 				</NextLink>
 			</Heading>
-			{items.length > 0 ? (
+			{phrases.length > 0 ? (
 				<SimpleGrid p="4" minChildWidth="250px" spacing="50px">
-					{items.map((item) => (
+					{phrases.map((item) => (
 						<Box
 							key={item.name}
 							border="1px"
