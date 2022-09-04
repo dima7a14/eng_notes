@@ -1,13 +1,13 @@
+import React from 'react';
 import Head from 'next/head';
 import { useSession, signOut } from 'next-auth/react';
-import { Container, Flex, Button, Text, useDisclosure } from '@chakra-ui/react';
+import { Container, Flex, Button, Text } from '@chakra-ui/react';
 
 import Navbar from './navbar';
 import Breadcrumbs from './breadcrumbs';
 import styles from '../styles/Layout.module.css';
 
-const Layout = ({ children }) => {
-	const { isOpen, onOpen, onClose } = useDisclosure();
+const Layout: React.FC = ({ children }) => {
 	const { data: session } = useSession();
 
 	return (
@@ -46,7 +46,7 @@ const Layout = ({ children }) => {
 							<Breadcrumbs />
 							<Flex flexDir="row" justify="flex-end" alignItems="center">
 								<Text>Signed in: {session.user?.email}</Text>
-								<Button variant="link" ml={2} onClick={signOut}>
+								<Button variant="link" ml={2} onClick={() => signOut()}>
 									Sign out
 								</Button>
 							</Flex>

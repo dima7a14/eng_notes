@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import {
-	Input,
+	Textarea,
 	FormControl,
 	FormLabel,
 	FormHelperText,
@@ -8,18 +8,28 @@ import {
 	InputGroup,
 	InputLeftElement,
 	InputRightElement,
+	FormControlProps,
 } from '@chakra-ui/react';
+import { FieldProps } from 'formik';
 
-export default function InputField({
+export type TextareaFieldProps = FieldProps & {
+	label?: string;
+	leftIcon?: React.ReactElement;
+	rightIcon?: React.ReactElement;
+	helperText?: string;
+	formControlProps: FormControlProps;
+};
+
+const TextareaField: React.FC<TextareaFieldProps> = ({
 	field,
 	form,
 	label,
 	leftIcon,
 	rightIcon,
 	helperText,
-	formControlProps = {},
+	formControlProps,
 	...props
-}) {
+}) => {
 	const error =
 		form.touched[field.name] && form.submitCount > 0
 			? form.errors[field.name]
@@ -35,7 +45,7 @@ export default function InputField({
 			)}
 			<InputGroup>
 				{leftIcon && <InputLeftElement>{leftIcon}</InputLeftElement>}
-				<Input focusBorderColor="green.400" {...field} {...props} />
+				<Textarea focusBorderColor="green.400" {...field} {...props} />
 				{rightIcon && <InputRightElement>{rightIcon}</InputRightElement>}
 			</InputGroup>
 			{!isError && helperText && (
@@ -46,12 +56,6 @@ export default function InputField({
 	);
 }
 
-InputField.propTypes = {
-	field: PropTypes.object,
-	form: PropTypes.object,
-	label: PropTypes.string,
-	leftIcon: PropTypes.element,
-	rightIcon: PropTypes.element,
-	helperText: PropTypes.string,
-	formControlProps: PropTypes.object,
-};
+TextareaField.displayName = 'TextareaField';
+
+export default TextareaField;

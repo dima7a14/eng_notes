@@ -1,11 +1,17 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
 
-const Breadcrumbs = () => {
+type Breadcrumb = {
+	breadcrumb: string;
+	href: string;
+};
+
+const Breadcrumbs: React.FC = () => {
 	const router = useRouter();
-	const [breadcrumbs, setBreadcrumbs] = useState([]);
+	const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([]);
 
 	useEffect(() => {
 		const linkPaths = router.asPath.split('/').filter((path) => path !== '');

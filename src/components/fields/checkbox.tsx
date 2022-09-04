@@ -1,19 +1,26 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import {
 	Checkbox,
 	FormControl,
 	FormHelperText,
 	FormErrorMessage,
+	FormControlProps,
 } from '@chakra-ui/react';
+import { FieldProps } from 'formik';
 
-export default function CheckboxField({
+export type CheckBoxFieldProps = FieldProps & {
+	helperText?: string;
+	formControlProps: FormControlProps;
+};
+
+const CheckboxField: React.FC<CheckBoxFieldProps> = ({
 	field,
 	form,
 	helperText,
 	children,
 	formControlProps = {},
 	...props
-}) {
+}) => {
 	const error = form.touched[field.name] && form.errors[field.name];
 	const isError = Boolean(error);
 
@@ -28,11 +35,6 @@ export default function CheckboxField({
 			{isError && <FormErrorMessage>{error}</FormErrorMessage>}
 		</FormControl>
 	);
-}
-
-CheckboxField.propTypes = {
-	field: PropTypes.object,
-	form: PropTypes.object,
-	helperText: PropTypes.string,
-	formControlProps: PropTypes.object,
 };
+
+export default CheckboxField;

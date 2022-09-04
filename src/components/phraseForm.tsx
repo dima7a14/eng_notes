@@ -21,6 +21,7 @@ import {
 	AlertDescription,
 	CloseButton,
 	useToast,
+	ButtonProps,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray } from 'formik';
@@ -89,10 +90,10 @@ const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({ name, title, itemTi
 	);
 }
 
-type PhraseFormProps = Partial<Omit<Phrase, 'userId'>> & {
+type PhraseFormProps = Partial<Omit<Phrase, 'userId'>> & Omit<ButtonProps, 'onSubmit'> & {
 	title: string;
 	buttonTitle: string;
-	onSubmit: (data: Phrase) => unknown;
+	onSubmit: (data: Phrase) => void;
 };
 
 type PhraseFormValues = {

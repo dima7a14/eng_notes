@@ -1,7 +1,8 @@
+import React from 'react';
 import NextLink from 'next/link';
 import { Flex, Heading, Link } from '@chakra-ui/react';
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
 	return (
 		<Flex
 			p={3}
