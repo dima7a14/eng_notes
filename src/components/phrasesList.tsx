@@ -1,46 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import NextLink from 'next/link';
-import { Box, Heading, SimpleGrid, Center, Link } from '@chakra-ui/react';
+import {
+	Box,
+	Heading,
+	SimpleGrid,
+	Center,
+	Link,
+	Spinner,
+} from '@chakra-ui/react';
 
-import server from '@/consts/server';
 import styles from '@/styles/PhrasesList.module.css';
-import type { Phrase } from '@/models/phrase';
-import PhraseForm from './phraseForm';
+import { trpc } from '@/utils/trpc';
+import AddPhrase from './addPhrase';
 
-export type PhrasesListProps = {
-	items?: Phrase[];
-};
-
-const PhrasesList: React.FC<PhrasesListProps> = ({ items = [] }) => {
-	const [phrases, setPhrases] = useState(items);
-	const createPhrase = (data: Phrase) => {
-		fetch(`${server}/api/phrases`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(data),
-		});
-	};
-
-	useEffect(() => {
-		const fetchPhrases = async () => {
-			const response = await fetch(`${server}/api/phrases`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			if (response.status === 200) {
-				const data: Phrase[] = await response.json();
-
-				setPhrases(data);
-			}
-		};
-
-		fetchPhrases();
-	}, []);
+const PhrasesList: React.FC = () => {
+	const { data, isLoading } = trpc.useQuery(['phrases.phrases']);
 
 	return (
 		<Box w="full">
@@ -49,9 +23,20 @@ const PhrasesList: React.FC<PhrasesListProps> = ({ items = [] }) => {
 					<Link>Phrases</Link>
 				</NextLink>
 			</Heading>
-			{phrases.length > 0 ? (
+			{isLoading && (
+				<Center>
+					<Spinner
+						thickness="4px"
+						speed="0.65s"
+						emptyColor="gray.200"
+						color="green.600"
+						size="xl"
+					/>
+				</Center>
+			)}
+			{data && data.length > 0 ? (
 				<SimpleGrid p="4" minChildWidth="250px" spacing="50px">
-					{phrases.map((item) => (
+					{data.map((item) => (
 						<Box
 							key={item.name}
 							border="1px"
@@ -61,7 +46,10 @@ const PhrasesList: React.FC<PhrasesListProps> = ({ items = [] }) => {
 							_hover={{ backgroundColor: 'gray.50' }}
 						>
 							<Heading as="h6" size="lg">
-								<NextLink href={`/phrases/${encodeURI(item.slug ?? '')}`} passHref>
+								<NextLink
+									href={`/phrases/${encodeURI(item.slug ?? '')}`}
+									passHref
+								>
 									<Link className={styles.name}>{item.name}</Link>
 								</NextLink>
 							</Heading>
@@ -73,12 +61,7 @@ const PhrasesList: React.FC<PhrasesListProps> = ({ items = [] }) => {
 					No phrases
 				</Center>
 			)}
-			<PhraseForm
-				title="Add phrase"
-				buttonTitle="Add new phrase"
-				mt="100px"
-				onSubmit={createPhrase}
-			/>
+			<AddPhrase mt={100} />
 		</Box>
 	);
 };

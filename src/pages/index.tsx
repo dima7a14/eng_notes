@@ -17,9 +17,7 @@ const Home: React.FC = () => {
 				<title>My English notes</title>
 			</Head>
 
-			<main className={styles.main}>
-				{session && <PhrasesList />}
-			</main>
+			<main className={styles.main}>{session && <PhrasesList />}</main>
 		</div>
 	);
 };

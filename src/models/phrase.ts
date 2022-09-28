@@ -1,7 +1,7 @@
 export interface Phrase {
 	id?: string;
 	name: string;
-	slug?: string; // TODO: remove it
+	slug?: string;
 	userId?: string;
 	translations: string[];
 	explanations: string[];

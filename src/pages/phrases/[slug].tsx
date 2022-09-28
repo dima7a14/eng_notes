@@ -14,10 +14,10 @@ import {
 	Badge,
 } from '@chakra-ui/react';
 
-import server from '@/consts/server';
-import styles from '@/styles/Phrase.module.css';
 import type { Phrase } from '@/models/phrase';
+import { trpc } from '@/utils/trpc';
 import { authOptions } from '../api/auth/[...nextauth]';
+import styles from '@/styles/Phrase.module.css';
 
 type InfoItemProps = {
 	title: string;
@@ -57,10 +57,12 @@ const InfoItem: React.FC<InfoItemProps> = ({ title, items }) => {
 InfoItem.displayName = 'InfoItem';
 
 export type PhraseProps = {
-	phrase: Phrase;
+	slug: string;
 };
 
-const Phrase: React.FC<PhraseProps> = ({ phrase }) => {
+const Phrase: React.FC<PhraseProps> = ({ slug }) => {
+	const { data: phrase } = trpc.useQuery(['phrases.phrase', { slug }]);
+
 	if (!phrase) {
 		return null;
 	}
@@ -88,7 +90,11 @@ const Phrase: React.FC<PhraseProps> = ({ phrase }) => {
 
 export default Phrase;
 
-export async function getServerSideProps({ req, res, query }: GetServerSidePropsContext) {
+export async function getServerSideProps({
+	req,
+	res,
+	query,
+}: GetServerSidePropsContext) {
 	const session = await unstable_getServerSession(req, res, authOptions);
 
 	if (!session) {
@@ -99,20 +105,17 @@ export async function getServerSideProps({ req, res, query }: GetServerSideProps
 		};
 	}
 
-	let phrase;
 	const { slug } = query;
-	const response = await fetch(`${server}/api/phrases/${slug}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
 
-	if (response.status === 200) {
-		phrase = await response.json();
+	if (!slug) {
+		return {
+			redirect: {
+				destination: '/phrases',
+			},
+		};
 	}
 
 	return {
-		props: { phrase },
+		props: { slug },
 	};
 }

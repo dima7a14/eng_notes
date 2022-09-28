@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
 	Box,
@@ -17,23 +17,48 @@ import {
 	Heading,
 	Alert,
 	AlertIcon,
-	AlertTitle,
 	AlertDescription,
-	CloseButton,
 	useToast,
 	ButtonProps,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray } from 'formik';
 
+import { trpc } from '@/utils/trpc';
 import { Phrase } from '@/models/phrase';
 import { InputField, TextareaField } from './fields';
+
+const Error: React.FC<{ message: string }> = ({ message }) => (
+	<Alert status="error" my="10px" borderRadius="md">
+		<AlertIcon />
+		<AlertDescription fontSize="sm">{message}</AlertDescription>
+	</Alert>
+);
+
+type ErrorsProps = {
+	errors?: string[];
+};
+
+const Errors: React.FC<ErrorsProps> = ({ errors }) => {
+	if (!errors) {
+		return null;
+	}
+
+	return (
+		<>
+			{errors.map((errMsg) => (
+				<Error key={errMsg} message={errMsg} />
+			))}
+		</>
+	);
+};
 
 type PhraseFieldArrayProps = {
 	name: string;
 	title: string;
 	itemTitle: string;
 	multiline?: boolean;
+	errors?: string[];
 };
 
 type PhraseFieldArrayValue = {
@@ -45,7 +70,13 @@ function parseFieldArrayValue(value: string): PhraseFieldArrayValue {
 	return { value, id: uuidv4() };
 }
 
-const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({ name, title, itemTitle, multiline = false }) => {
+const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({
+	name,
+	title,
+	itemTitle,
+	multiline = false,
+	errors,
+}) => {
 	const InputCmp = multiline ? TextareaField : InputField;
 
 	return (
@@ -55,24 +86,29 @@ const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({ name, title, itemTi
 					<Heading as="h6" size="md" mb="20px">
 						{title}
 					</Heading>
-					{form.values[name].map((value: PhraseFieldArrayValue, index: number) => (
-						<Field
-							key={value.id}
-							component={InputCmp}
-							name={`${name}.${index}.value`}
-							rightIcon={
-								<IconButton
-									type="button"
-									aria-label={`Remove ${itemTitle}`}
-									icon={<CloseIcon />}
-									colorScheme="red"
-									onClick={() => remove(index)}
-									size="xs"
+					{form.values[name].map(
+						(value: PhraseFieldArrayValue, index: number) => (
+							<>
+								<Field
+									key={value.id}
+									component={InputCmp}
+									name={`${name}.${index}.value`}
+									rightIcon={
+										<IconButton
+											type="button"
+											aria-label={`Remove ${itemTitle}`}
+											icon={<CloseIcon />}
+											colorScheme="red"
+											onClick={() => remove(index)}
+											size="xs"
+										/>
+									}
+									formControlProps={{ mb: '10px' }}
 								/>
-							}
-							formControlProps={{ mb: '10px' }}
-						/>
-					))}
+								{errors?.[index] && <Error message={errors[index]} />}
+							</>
+						),
+					)}
 					<Box>
 						<Button
 							type="button"
@@ -88,13 +124,10 @@ const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({ name, title, itemTi
 			)}
 		</FieldArray>
 	);
-}
-
-type PhraseFormProps = Partial<Omit<Phrase, 'userId'>> & Omit<ButtonProps, 'onSubmit'> & {
-	title: string;
-	buttonTitle: string;
-	onSubmit: (data: Phrase) => void;
 };
+
+type AddPhraseProps = Partial<Omit<Phrase, 'userId'>> &
+	Omit<ButtonProps, 'onSubmit'>;
 
 type PhraseFormValues = {
 	name: string;
@@ -103,29 +136,51 @@ type PhraseFormValues = {
 	explanations: PhraseFieldArrayValue[];
 };
 
-const PhraseForm: React.FC<PhraseFormProps> = ({
-	id,
-	title,
-	buttonTitle,
+const AddPhrase: React.FC<AddPhraseProps> = ({
 	name = '',
 	translations = [],
 	explanations = [],
 	examples = [],
-	onSubmit,
 	...otherProps
 }) => {
-	const [error, setError] = useState<Error | null>(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const btnRef = useRef<HTMLButtonElement | null>(null);
 	const toast = useToast();
-	const handleSubmit = async (values: PhraseFormValues) => {
-		setError(null);
-
-		const phrase: Phrase = {
+	const utils = trpc.useContext();
+	const { mutate, error, isLoading } = trpc.useMutation(
+		['phrases.create-phrase'],
+		{
+			onSuccess: (input) => {
+				utils.invalidateQueries(['phrases.phrases']);
+				utils.invalidateQueries(['phrases.phrase', { slug: input.slug }]);
+				utils.invalidateQueries(['phrases.phrase', { id: input.id }]);
+				onClose();
+				toast({
+					title: 'New phrase has been added',
+					status: 'success',
+					duration: 3000,
+					isClosable: false,
+				});
+			},
+			onError: () => {
+				toast({
+					title: 'Error while adding new phrase',
+					status: 'error',
+					duration: 3000,
+					isClosable: false,
+				});
+			},
+		},
+	);
+	const parsedErrors = {
+		...error?.data?.zodError?.fieldErrors,
+	};
+	const handleSubmit = (values: PhraseFormValues) => {
+		const phrase = {
 			...values,
 			translations: values.translations
 				.map(({ value }) => value)
-				.filter((value) => Boolean(value)),
+				.filter((value) => Boolean(value)) as [string, ...string[]],
 			examples: values.examples
 				.map(({ value }) => value)
 				.filter((value) => Boolean(value)),
@@ -134,20 +189,7 @@ const PhraseForm: React.FC<PhraseFormProps> = ({
 				.filter((value) => Boolean(value)),
 		};
 
-		try {
-			onSubmit(phrase);
-			toast({
-				title: id ? 'Phrase updated' : 'Phrase created',
-				status: 'success',
-				duration: 3000,
-				isClosable: true,
-			});
-			onClose();
-		} catch (error) {
-			if (error instanceof Error) {
-				setError(error);
-			}
-		}
+		mutate(phrase);
 	};
 
 	return (
@@ -161,7 +203,7 @@ const PhraseForm: React.FC<PhraseFormProps> = ({
 					onClick={onOpen}
 					{...otherProps}
 				>
-					{buttonTitle}
+					Add new phrase
 				</Button>
 			</Center>
 			<Drawer
@@ -184,54 +226,47 @@ const PhraseForm: React.FC<PhraseFormProps> = ({
 							<DrawerOverlay />
 							<DrawerContent>
 								<DrawerCloseButton />
-								<DrawerHeader>{title}</DrawerHeader>
+								<DrawerHeader>Add new phrase</DrawerHeader>
 								<DrawerBody>
-									{error && (
-										<Alert status="error">
-											<AlertIcon />
-											{/* <AlertTitle mr={2}>{error.status}</AlertTitle> */}
-											<AlertDescription fontSize="sm">
-												{error.message}
-											</AlertDescription>
-											<CloseButton
-												position="absolute"
-												right="8px"
-												top="8px"
-												onClick={() => setError(null)}
-											/>
-										</Alert>
-									)}
 									<Field
 										component={InputField}
 										label="Phrase"
 										name="name"
 										placeholder="Phrase"
 									/>
+									<Errors errors={parsedErrors?.name} />
 									<Divider my="20px" />
 									<PhraseFieldArray
 										name="translations"
 										title="Translations"
 										itemTitle="Translation"
+										errors={parsedErrors?.translations}
 									/>
 									<PhraseFieldArray
 										name="explanations"
 										title="Explanations"
 										itemTitle="Explanation"
 										multiline
+										errors={parsedErrors?.explanations}
 									/>
 									<PhraseFieldArray
 										name="examples"
 										title="Examples"
 										itemTitle="Example"
 										multiline
+										errors={parsedErrors?.examples}
 									/>
 								</DrawerBody>
 								<DrawerFooter>
 									<Button variant="outline" mr={4} onClick={onClose}>
 										Cancel
 									</Button>
-									<Button colorScheme="green" type="submit">
-										{id ? 'Update' : 'Create'}
+									<Button
+										colorScheme="green"
+										type="submit"
+										isLoading={isLoading}
+									>
+										Save
 									</Button>
 								</DrawerFooter>
 							</DrawerContent>
@@ -243,5 +278,4 @@ const PhraseForm: React.FC<PhraseFormProps> = ({
 	);
 };
 
-
-export default PhraseForm;
+export default AddPhrase;
