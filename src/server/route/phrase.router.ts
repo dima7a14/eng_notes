@@ -5,6 +5,7 @@ import {
 	createPhraseSchema,
 	updatePhraseSchema,
 	getSinglePhraseSchema,
+	searchPhrasesSchema,
 } from '@/schemas/phrase.schema';
 import { createRouter } from '../createRouter';
 
@@ -24,17 +25,39 @@ export const phraseRouter = createRouter()
 			return phrases;
 		},
 	})
+	.query('search-phrases', {
+		input: searchPhrasesSchema,
+		async resolve({ ctx, input }) {
+			const userId = ctx.session?.user.id;
+			const { search } = input;
+			const phrases = await ctx.prisma.phrase.findMany({
+				where: {
+					AND: [{ userId }, { name: { contains: search } }],
+				},
+			});
+
+			return phrases;
+		},
+	})
 	.query('phrase', {
 		input: getSinglePhraseSchema,
 		async resolve({ ctx, input }) {
+			const userId = ctx.session?.user.id;
 			const phrase = await ctx.prisma.phrase.findFirst({
 				where: {
-					OR: [
+					AND: [
 						{
-							id: input.id,
+							userId,
 						},
 						{
-							slug: input.slug,
+							OR: [
+								{
+									id: input.id,
+								},
+								{
+									slug: input.slug,
+								},
+							],
 						},
 					],
 				},

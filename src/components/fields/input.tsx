@@ -9,6 +9,7 @@ import {
 	InputLeftElement,
 	InputRightElement,
 	FormControlProps,
+	InputElementProps,
 } from '@chakra-ui/react';
 import { FieldProps } from 'formik';
 
@@ -17,7 +18,9 @@ export type InputFieldProps = FieldProps & {
 	leftIcon?: React.ReactElement;
 	rightIcon?: React.ReactElement;
 	helperText?: string;
-	formControlProps: FormControlProps;
+	formControlProps?: FormControlProps;
+	inputLeftElementProps?: InputElementProps;
+	inputRightElementProps?: InputElementProps;
 };
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -28,6 +31,8 @@ const InputField: React.FC<InputFieldProps> = ({
 	rightIcon,
 	helperText,
 	formControlProps = {},
+	inputLeftElementProps = {},
+	inputRightElementProps = {},
 	...props
 }) => {
 	const error =
@@ -44,9 +49,17 @@ const InputField: React.FC<InputFieldProps> = ({
 				</FormLabel>
 			)}
 			<InputGroup>
-				{leftIcon && <InputLeftElement>{leftIcon}</InputLeftElement>}
+				{leftIcon && (
+					<InputLeftElement {...inputLeftElementProps}>
+						{leftIcon}
+					</InputLeftElement>
+				)}
 				<Input focusBorderColor="green.400" {...field} {...props} />
-				{rightIcon && <InputRightElement>{rightIcon}</InputRightElement>}
+				{rightIcon && (
+					<InputRightElement {...inputRightElementProps}>
+						{rightIcon}
+					</InputRightElement>
+				)}
 			</InputGroup>
 			{!isError && helperText && (
 				<FormHelperText color="gray.600">{helperText}</FormHelperText>

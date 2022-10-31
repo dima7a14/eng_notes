@@ -27,3 +27,7 @@ export const getSinglePhraseSchema = z.object({
 		.max(256, 'Max slug length is 256')
 		.optional(),
 });
+
+export const searchPhrasesSchema = z.object({
+	search: z.string().trim().min(3, 'Min search string is 3'),
+});
