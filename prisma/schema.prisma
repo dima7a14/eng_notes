@@ -65,8 +65,8 @@ model VerificationToken {
 
 model Phrase {
   id           String   @id @default(cuid())
-  name         String   @unique
-  slug         String   @unique
+  name         String
+  slug         String
   insertedAt   DateTime @default(now()) @map("inserted_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   translations String[]

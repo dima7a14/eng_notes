@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, Fragment } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
 	Box,
@@ -88,9 +88,8 @@ const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({
 					</Heading>
 					{form.values[name].map(
 						(value: PhraseFieldArrayValue, index: number) => (
-							<>
+							<Fragment key={value.id}>
 								<Field
-									key={value.id}
 									component={InputCmp}
 									name={`${name}.${index}.value`}
 									rightIcon={
@@ -106,7 +105,7 @@ const PhraseFieldArray: React.FC<PhraseFieldArrayProps> = ({
 									formControlProps={{ mb: '10px' }}
 								/>
 								{errors?.[index] && <Error message={errors[index]} />}
-							</>
+							</Fragment>
 						),
 					)}
 					<Box>
