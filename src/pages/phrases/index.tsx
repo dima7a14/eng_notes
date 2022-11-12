@@ -3,7 +3,6 @@ import type { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { unstable_getServerSession } from 'next-auth/next';
 
-import PhrasesList from '@/components/phrasesList';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 const Phrases: React.FC = () => {
@@ -12,7 +11,7 @@ const Phrases: React.FC = () => {
 			<Head>
 				<title>Phrases</title>
 			</Head>
-			<PhrasesList />
+			<div>Under development</div>
 		</>
 	);
 };

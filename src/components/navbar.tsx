@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
 			justify="center"
 			borderBottom="1px"
 			borderBottomColor="gray.300"
-			borderBottomRadius="md"
+			borderRadius="md"
 			shadow="base"
 			mb={[0, 0, 0, 12]}
 			position="sticky"
