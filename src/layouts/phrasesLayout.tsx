@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {
 	Flex,
@@ -9,7 +10,9 @@ import {
 	Heading,
 	Divider,
 	CircularProgress,
+	Button,
 } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
 import dayjs from 'dayjs';
 import { Phrase } from '@prisma/client';
 import { trpc } from '../utils/trpc';
@@ -63,9 +66,12 @@ const PhrasesList: React.FC<{ phrases?: Phrase[] }> = ({ phrases }) => {
 	);
 };
 
+const addPhraseRoute = '/phrases/add';
+
 export const PhrasesLayout: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
+	const router = useRouter();
 	const { data: phrases, isLoading } = trpc.useQuery(['phrases.phrases']);
 
 	return (
@@ -88,7 +94,22 @@ export const PhrasesLayout: React.FC<{ children: React.ReactNode }> = ({
 						<CircularProgress isIndeterminate color="green.200" size={90} />
 					</Flex>
 				) : (
-					<PhrasesList phrases={phrases} />
+					<>
+						<PhrasesList phrases={phrases} />
+						{router.pathname !== addPhraseRoute && (
+							<Center mt={2}>
+								<Button
+									type="button"
+									colorScheme="green"
+									size="sm"
+									leftIcon={<AddIcon />}
+									onClick={() => router.push(addPhraseRoute)}
+								>
+									Add new Phrase
+								</Button>
+							</Center>
+						)}
+					</>
 				)}
 			</Box>
 			<Box flex="1 0 auto" height="100%">
