@@ -14,12 +14,12 @@ export type CreatePhraseInput = z.TypeOf<typeof createPhraseSchema>;
 
 export const updatePhraseSchema = z
 	.object({
-		id: string().uuid(),
+		id: string().cuid(),
 	})
 	.merge(createPhraseSchema.deepPartial());
 
 export const getSinglePhraseSchema = z.object({
-	id: z.string().uuid({ message: 'Invalid UUID' }).optional(),
+	id: z.string().cuid({ message: 'Invalid CUID' }).optional(),
 	slug: z
 		.string()
 		.trim()

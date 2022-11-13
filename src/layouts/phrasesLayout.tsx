@@ -63,7 +63,9 @@ const PhrasesList: React.FC<{ phrases?: Phrase[] }> = ({ phrases }) => {
 	);
 };
 
-export const PhrasesLayout: React.FC = ({ children }) => {
+export const PhrasesLayout: React.FC<{ children: React.ReactNode }> = ({
+	children,
+}) => {
 	const { data: phrases, isLoading } = trpc.useQuery(['phrases.phrases']);
 
 	return (
@@ -71,7 +73,7 @@ export const PhrasesLayout: React.FC = ({ children }) => {
 			<Box
 				bg="white"
 				p="2"
-				boxShadow="lg"
+				boxShadow="base"
 				width={300}
 				height="100%"
 				borderRadius="md"
