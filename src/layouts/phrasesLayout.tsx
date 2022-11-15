@@ -18,7 +18,17 @@ import { Phrase } from '@prisma/client';
 import { trpc } from '../utils/trpc';
 
 const PhraseBlock: React.FC<{ phrase: Phrase }> = ({ phrase }) => (
-	<Box mt={2} p={4} backgroundColor="gray.50" borderRadius="md">
+	<Box
+		mt={2}
+		p={4}
+		backgroundColor="gray.50"
+		borderRadius="md"
+		transitionProperty="background"
+		transitionDuration="200ms"
+		_hover={{
+			backgroundColor: 'gray.200',
+		}}
+	>
 		<Box mb={2}>
 			<Heading as="h4" size="md" color="gray.700">
 				<Link href={`/phrases/${phrase.slug}`}>{phrase.name}</Link>

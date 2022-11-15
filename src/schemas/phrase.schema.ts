@@ -16,7 +16,7 @@ export const updatePhraseSchema = z
 	.object({
 		id: string().cuid(),
 	})
-	.merge(createPhraseSchema.deepPartial());
+	.merge(createPhraseSchema);
 
 export const getSinglePhraseSchema = z.object({
 	id: z.string().cuid({ message: 'Invalid CUID' }).optional(),

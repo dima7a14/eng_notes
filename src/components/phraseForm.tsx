@@ -6,6 +6,10 @@ import {
 	ButtonGroup,
 	Button,
 	CircularProgress,
+	Alert,
+	AlertIcon,
+	AlertDescription,
+	Divider,
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { Formik, Form, Field, FieldArray, FormikHelpers } from 'formik';
@@ -23,6 +27,7 @@ export type PhraseFormProps = {
 	isLoading: boolean;
 	isSubmitting: boolean;
 	initialValues?: PhraseValues;
+	errors?: Record<string, string[] | undefined>;
 	onSubmit: (
 		values: PhraseValues,
 		helpers: FormikHelpers<PhraseValues>,
@@ -38,6 +43,7 @@ const defaultInitialValues: PhraseValues = {
 
 export const PhraseForm: React.FC<PhraseFormProps> = ({
 	initialValues = defaultInitialValues,
+	errors = {},
 	isLoading,
 	isSubmitting,
 	onSubmit,
@@ -73,42 +79,53 @@ export const PhraseForm: React.FC<PhraseFormProps> = ({
 								containerProps={{ justifyContent: 'center' }}
 							/>
 						</Heading>
-						<PhraseFieldArray
-							name="translations"
-							label="Translations"
-							fieldProps={{ mt: 2 }}
-						/>
-						<PhraseFieldArray
-							name="explanations"
-							label="Explanations"
-							fieldProps={{ mt: 2 }}
-						/>
-						<PhraseFieldArray
-							name="examples"
-							label="Examples"
-							fieldProps={{ mt: 2 }}
-						/>
-						{dirty && (
-							<ButtonGroup p={3}>
-								<Button
-									colorScheme="green"
-									size="md"
-									type="submit"
-									isLoading={isSubmitting}
-								>
-									Save
-								</Button>
-								<Button
-									colorScheme="red"
-									size="md"
-									type="button"
-									onClick={() => resetForm()}
-									disabled={isSubmitting}
-								>
-									Reset
-								</Button>
-							</ButtonGroup>
-						)}
+						<Box p={4}>
+							<Errors errors={errors.name} />
+							<PhraseFieldArray
+								name="translations"
+								label="Translations"
+								fieldProps={{ mt: 2 }}
+							/>
+							<Errors errors={errors.translations} />
+							<Divider my={8} />
+							<PhraseFieldArray
+								name="explanations"
+								label="Explanations"
+								fieldProps={{ mt: 2 }}
+							/>
+							<Errors errors={errors.explanations} />
+							<Divider my={8} />
+							<PhraseFieldArray
+								name="examples"
+								label="Examples"
+								fieldProps={{ mt: 2 }}
+							/>
+							<Errors errors={errors.examples} />
+							{dirty && (
+								<>
+									<Divider my={8} />
+									<ButtonGroup>
+										<Button
+											colorScheme="green"
+											size="md"
+											type="submit"
+											isLoading={isSubmitting}
+										>
+											Save
+										</Button>
+										<Button
+											colorScheme="red"
+											size="md"
+											type="button"
+											onClick={() => resetForm()}
+											disabled={isSubmitting}
+										>
+											Reset
+										</Button>
+									</ButtonGroup>
+								</>
+							)}
+						</Box>
 					</Box>
 				</Form>
 			)}
@@ -123,7 +140,7 @@ const PhraseFieldArray: React.FC<{
 }> = ({ name, label, fieldProps = {} }) => (
 	<FieldArray name={name}>
 		{({ form, push, remove }) => (
-			<Box p={4}>
+			<Box>
 				<Heading as="h6" size="md" mb={2}>
 					{label}
 				</Heading>
@@ -154,3 +171,24 @@ const PhraseFieldArray: React.FC<{
 		)}
 	</FieldArray>
 );
+
+const Error: React.FC<{ message: string }> = ({ message }) => (
+	<Alert status="error" my="10px" borderRadius="md">
+		<AlertIcon />
+		<AlertDescription fontSize="sm">{message}</AlertDescription>
+	</Alert>
+);
+
+const Errors: React.FC<{ errors?: string[] }> = ({ errors }) => {
+	if (!errors) {
+		return null;
+	}
+
+	return (
+		<>
+			{errors.map((errMsg) => (
+				<Error key={errMsg} message={errMsg} />
+			))}
+		</>
+	);
+};

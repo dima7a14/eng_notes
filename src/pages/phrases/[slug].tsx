@@ -85,6 +85,7 @@ const Phrase: React.FC<PhraseProps> = ({ slug }) => {
 					explanations: phrase.explanations,
 					examples: phrase.examples,
 				}}
+				errors={error?.data?.zodError?.fieldErrors}
 				isLoading={isLoading}
 				isSubmitting={isSaving}
 				onSubmit={handleSubmit}

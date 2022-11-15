@@ -70,6 +70,7 @@ const AddPhrase: React.FC = () => {
 				isLoading={false}
 				isSubmitting={isLoading}
 				onSubmit={handleSubmit}
+				errors={error?.data?.zodError?.fieldErrors}
 			/>
 		</>
 	);
